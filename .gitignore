@@ -1,3 +1,6 @@
+.DS_Store
+.env
+
 # Cache and logs (Symfony2)
 /app/cache/*
 /app/logs/*
