@@ -116,4 +116,10 @@ class Screenings
 
         return $this;
     }
+
+  public function __toString()
+  {
+    // TODO: Implement __toString() method.
+    return 'Screening'.$this->id;
+  }
 }

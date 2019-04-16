@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    <h1>New Booking</h1>
+
+    {{ form_start(bookingForm) }}
+    {{ form_row(bookingForm.screeningId) }}
+    <button class="button">Book it !</button>
+    {{ form_end(bookingForm) }}
+{% endblock %}
