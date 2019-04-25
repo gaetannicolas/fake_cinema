@@ -10,6 +10,7 @@
         <li>
             <p>{{ booking.screeningId }}</p>
             <p>{{ booking.screeningId.filmId }}</p>
+            <a href="{{ path('deleteBooking', {'id': booking.id}) }}">Delete</a>
         </li>
 
     {% endfor %}

@@ -7,6 +7,9 @@
     </head>
     <body>
         <a href="{{ path('home') }}">Home</a>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <a href="{{ path('app_logout') }}">Logout</a>
+        {% endif %}
         {% block body %}{% endblock %}
         {% block javascripts %}{% endblock %}
     </body>

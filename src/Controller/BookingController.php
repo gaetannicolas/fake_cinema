@@ -3,28 +3,39 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
-use App\Entity\Screenings;
+use App\Entity\Films;
 use App\Form\BookingType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
 use App\Repository\BookingRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use App\FormatManager\FormFormat;
 
-class BookingController extends Controller
+class BookingController extends AbstractController
 {
   /**
    * @Route("/book", name="book")
    * @param Request $request
+   * @param EntityManagerInterface $manager
    * @return Response
+   * @var Films $film
    */
-  public function addBooking(Request $request, EntityManagerInterface $manager): Response
+
+  public function addBooking(Request $request, EntityManagerInterface $manager, FormFormat $format): Response
   {
+    $film = $manager->getRepository(Films::class)->findOneById($request->get('id'));
     $booking = new Booking();
     $booking->setUserId($this->getUser());
-    $form = $this->createForm(BookingType::class, $booking)->handleRequest($request);
+    $screenings = $manager->getRepository(Films::class)->find($request->get('id'))->getScreenings();
+    $form = $this->createForm(BookingType::class, $booking, [
+      'screening'=> $format->formatScreeningsForBookingForm($screenings)
+    ])->handleRequest($request);
+
+
     if ($form->isSubmitted() && $form->isValid()) {
       $manager->persist($booking);
       $manager->flush();
@@ -32,12 +43,13 @@ class BookingController extends Controller
     }
     return $this->render('booking/new.html.twig', [
       'bookingForm' => $form->createView(),
+      'film' => $film
     ]);
   }
 
   /**
    * @Route("/bookings", name="bookings")
-   * @param EntityManagerInterface $entityManager
+   * @param BookingRepository $bookingRepository
    * @return Response
    */
   public function bookings(BookingRepository $bookingRepository)
@@ -48,4 +60,19 @@ class BookingController extends Controller
       'bookings' => $bookings
     ));
   }
+
+  /**
+   * @Route("/deleteBooking/{id}", name="deleteBooking")
+   * @ParamConverter("id", class=Booking::class)
+   * @param Booking $booking
+   * @param EntityManagerInterface $entityManager
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   */
+  public function deleteBooking(Booking $booking, EntityManagerInterface $entityManager)
+  {
+    $entityManager->remove($booking);
+    $entityManager->flush();
+    return $this->redirectToRoute('bookings');
+  }
+
 }

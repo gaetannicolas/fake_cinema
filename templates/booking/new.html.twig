@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>New Booking</h1>
-
+    <h2>{{ film.title }}</h2>
     {{ form_start(bookingForm) }}
     {{ form_row(bookingForm.screeningId) }}
     <button class="button">Book it !</button>
