@@ -117,9 +117,13 @@ class Screenings
         return $this;
     }
 
-  public function __toString()
+/*  public function __toString()
   {
     // TODO: Implement __toString() method.
     return 'Screening'.$this->id;
+  }*/
+  public function __toString()
+  {
+    return (string) 'Seance du '.$this->getStartAt()->format('Y-m-d');
   }
 }

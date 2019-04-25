@@ -1,0 +1,21 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Fake Cinema{% endblock %}
+
+{% block body %}
+    <a href="{{ path('bookings')}}">Mes réservations</a>
+    <h1>Films</h1>
+
+    {% for film in films %}
+        <div>
+            <a href="{{ path('filmDetail', {'id': film.id}) }}">{{ film.title }}</a>
+
+            {% for screening in film.screenings %}
+                {{ screening }}
+            {% endfor %}
+        </div>
+
+
+    {% endfor %}
+{% endblock %}

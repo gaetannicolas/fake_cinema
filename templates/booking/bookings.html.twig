@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fake Cinema{% endblock %}
+
+{% block body %}
+<h1>Bookings</h1>
+    <ul>
+    {% for booking in bookings %}
+
+        <li>
+            <p>{{ booking.screeningId }}</p>
+            <p>{{ booking.screeningId.filmId }}</p>
+        </li>
+
+    {% endfor %}
+    </ul>
+
+{% endblock %}

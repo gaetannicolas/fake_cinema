@@ -3,42 +3,49 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\Screenings;
 use App\Form\BookingType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
+use App\Repository\BookingRepository;
 
 class BookingController extends Controller
 {
-
-  private $security;
-
-  public function __construct(Security $security)
-  {
-    $this->security = $security;
-  }
-
   /**
    * @Route("/book", name="book")
    * @param Request $request
    * @return Response
    */
-  public function addBooking(Request $request): Response
+  public function addBooking(Request $request, EntityManagerInterface $manager): Response
   {
     $booking = new Booking();
-    $form = $this->createForm(BookingType::class, $booking);
-    $form->handleRequest($request);
+    $booking->setUserId($this->getUser());
+    $form = $this->createForm(BookingType::class, $booking)->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
-      $booking->setUserId($this->getUser());
-      $entityManager = $this->getDoctrine()->getManager();
-      $entityManager->persist($booking);
-      $entityManager->flush();
-      return $this->redirectToRoute('reservationSummary', ['id' => $booking->getId()]);
+      $manager->persist($booking);
+      $manager->flush();
+      return $this->redirectToRoute('bookings');
     }
     return $this->render('booking/new.html.twig', [
       'bookingForm' => $form->createView(),
     ]);
+  }
+
+  /**
+   * @Route("/bookings", name="bookings")
+   * @param EntityManagerInterface $entityManager
+   * @return Response
+   */
+  public function bookings(BookingRepository $bookingRepository)
+  {
+    $bookings = $bookingRepository->findBy(["userId" => $this->getUser()]);
+
+    return $this->render('booking/bookings.html.twig', array(
+      'bookings' => $bookings
+    ));
   }
 }
